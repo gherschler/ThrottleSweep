@@ -28,7 +28,16 @@ void loop() {
   throttle.writeMicroseconds(throt_low);
   active = pulseIn(cmdpin, HIGH);
   if (active >= active_trig) {
-    for (throt_cmd = throt_low; throt_cmd <= throt_high; throt_cmd += interval) {
+    for (throt_cmd = throt_low + interval; throt_cmd <= throt_high; throt_cmd += interval) {
+      throttle.writeMicroseconds(throt_cmd);
+      delay(hold_time);
+      active = pulseIn(cmdpin, HIGH);
+      if (active < active_trig) {
+        throttle.writeMicroseconds(throt_low);
+        break;
+      }
+    }
+    for (throt_cmd = throt_high - interval; throt_cmd >= throt_low; throt_cmd -= interval) {
       throttle.writeMicroseconds(throt_cmd);
       delay(hold_time);
       active = pulseIn(cmdpin, HIGH);
